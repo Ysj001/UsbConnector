@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ysj.usb.usbconnector">
+
+    <application>
+        <!--用于 usb 权限请求的 activity ，该 activity 可以防止每次 usb 都要请求连接权限-->
+        <activity
+            android:name="com.ysj.usb.usbconnector.core.UsbPermissionActivity"
+            android:theme="@style/TranslucentAppTheme">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <!--device_filter 为设备过滤配置-->
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+        </activity>
+    </application>
+
+</manifest>
