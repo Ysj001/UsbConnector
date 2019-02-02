@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-group = 'com.github.Ysj001'
 
 android {
     compileSdkVersion 28
