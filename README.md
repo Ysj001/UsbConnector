@@ -1,10 +1,7 @@
-﻿@[TOC](Android UsbConnector 轻松操作 Usb Device)
-
+﻿
 先上文档 : [Android Usb 官方文档](https://developer.android.google.cn/reference/android/hardware/usb/package-summary?hl=zh-cn)
 
-库地址: [UsbConnector ](https://github.com/Ysj001/UsbConnector)
-
-简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听！
+简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库。运用该库可省略 USB 状态监听及 USB 连接权限的处理，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听的功能！
  
 # 一.基本配置
 ## 1.导入 USBConnector 库
@@ -156,3 +153,6 @@ mOperate.connected(this);
     // 输出端点
     UsbEndpoint endpointOut;
 ```
+
+
+我的博客 : [Android 轻松连接 Usb Device —— UsbConnector](https://blog.csdn.net/qq_35365635/article/details/86743451)
