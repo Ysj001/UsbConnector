@@ -36,40 +36,6 @@ dependencies {
 </resources>
 ```
 
-## 3.在 manifest 中设置过滤
-- 如下所示，在 application 下建立 meta-data 其 name 为 android.hardware.usb.action.USB_DEVICE_ATTACHED，resource 为@xml/device_filter
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.ysj.usb.usbtest">
-
-    <application
-        android:name=".App"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
-
-        <meta-data
-            android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-            android:resource="@xml/device_filter" />
-
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-
-</manifest>
-```
-
 # 二.初始化连接器 / 释放连接器
 - 在任意位置都可调用 UsbConnector.init(context) 来对该库进行初始化，如下为在 Application 的 onCreate() 函数中初始化
 
