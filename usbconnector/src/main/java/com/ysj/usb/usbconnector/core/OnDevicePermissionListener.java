@@ -7,8 +7,7 @@ package com.ysj.usb.usbconnector.core;
  * @author Ysj
  * Created time: 2019/1/18 11:12
  */
-public interface OnDevicePermissionListener
-{
+public interface OnDevicePermissionListener {
     /**
      * 权限请求结果监听
      *

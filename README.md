@@ -2,12 +2,12 @@
 先上文档 : [Android Usb 官方文档](https://developer.android.google.cn/reference/android/hardware/usb/package-summary?hl=zh-cn)
 
 简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库。运用该库可省略 USB 状态监听及 USB 连接权限的处理，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听的功能！
- 
+
 # 一.基本配置
 ## 1.导入 USBConnector 库
 ### Step 1. Add the JitPack repository to your build file .
 Add it in your root build.gradle at the end of repositories:
-```java
+```gradle
 allprojects {
 		repositories {
 			...
@@ -16,9 +16,9 @@ allprojects {
 	}
 ```
 ### Step 2. Add the dependency
-```java
+```gradle
 dependencies {
-	        implementation 'com.github.Ysj001:UsbConnector:v1.0.1'
+	        implementation 'com.github.Ysj001:UsbConnector:1.0.3'
 	}
 ```
 ## 2.创建 Usb Device 过滤文件
@@ -37,31 +37,22 @@ dependencies {
 ```
 
 # 二.初始化连接器 / 释放连接器
-- 在任意位置都可调用 UsbConnector.init(context) 来对该库进行初始化，如下为在 Application 的 onCreate() 函数中初始化
+- 在任意位置都可调用 UsbConnector.init(context) 来对该库进行初始化，如下为在 Activity 的 onCreate() 函数中初始化
 
-- 在任意位置都可调用 UsbConnector.release(context) 来释放该库，如下为在 Application 的 onTerminate() 函数中释放
+- 在任意位置都可调用 UsbConnector.release(context) 来释放该库，如下为在 Activity 的 onTerminate() 函数中释放
 ```java
-public class App extends Application
-{
-
     @Override
-    public void onCreate()
-    {
-        super.onCreate();
-        // 初始化连接器
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         UsbConnector.init(this);
-
     }
-
+    ... ... 
     @Override
-    public void onTerminate()
-    {
-        super.onTerminate();
-        // 释放连接器
+    protected void onDestroy() {
+        super.onDestroy();
         UsbConnector.release(this);
     }
-
-}
 ```
 以上步骤完成后
 # 三.对 USB device 进行操作

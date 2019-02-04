@@ -12,12 +12,10 @@ import com.ysj.usb.usbconnector.R;
  * @author Ysj
  * Created time: 2019/1/18 11:55
  */
-public class UsbPermissionActivity extends AppCompatActivity
-{
+public class UsbPermissionActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usb_permission);
         finish();

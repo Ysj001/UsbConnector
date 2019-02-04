@@ -9,8 +9,7 @@ import android.hardware.usb.UsbManager;
  * @author Ysj
  * Created time: 2019/1/18 11:09
  */
-public interface OnDeviceStateListener
-{
+public interface OnDeviceStateListener {
     /**
      * 设备状态监听
      *

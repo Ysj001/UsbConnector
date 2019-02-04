@@ -39,7 +39,7 @@ public class UsbOperate implements IUsbOperate
         {
             USBHolder.getInstance().getUsbDeviceConnection().close();
             USBHolder.getInstance().onDisConnected();
-            USBHolder.getInstance().getUsbReceiver().sendDeviceState(UsbAction.ACTION_USB_DISCONNECTED);
+            USBHolder.getInstance().getUsbReceiver().sendDeviceState(UsbAction.ACTION_USB_NO_CONNECTED);
         }
     }
 

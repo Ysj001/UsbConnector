@@ -15,23 +15,19 @@ import java.util.List;
  * @author Ysj
  * Created time: 2019/1/3 14:20
  */
-public class USBHolder
-{
+public class USBHolder {
 
-    private USBHolder()
-    {
+    private USBHolder() {
     }
 
-    private static class Holder
-    {
+    private static class Holder {
         private static USBHolder INSTANCE = new USBHolder();
     }
 
     /**
      * 获取 USBHolder 实例
      */
-    public static USBHolder getInstance()
-    {
+    public static USBHolder getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -54,8 +50,7 @@ public class USBHolder
     /**
      * 设备拔出时
      */
-    protected void onUsbDetached()
-    {
+    protected void onUsbDetached() {
         this.usbDevice = null;
         this.usbInterface = null;
         this.usbDeviceConnection = null;
@@ -66,8 +61,7 @@ public class USBHolder
     /**
      * 当断开连接时
      */
-    protected void onDisConnected()
-    {
+    protected void onDisConnected() {
         this.usbDeviceConnection = null;
         this.endpointIn = null;
         this.endpointOut = null;
@@ -78,68 +72,55 @@ public class USBHolder
      *
      * @return 若已连接则返回 true
      */
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return usbDeviceConnection != null && endpointOut != null && endpointIn != null;
     }
 
-    protected USBReceiver getUsbReceiver()
-    {
+    protected USBReceiver getUsbReceiver() {
         return usbReceiver;
     }
 
-    protected void setUsbReceiver(USBReceiver usbReceiver)
-    {
+    protected void setUsbReceiver(USBReceiver usbReceiver) {
         this.usbReceiver = usbReceiver;
     }
 
-    public UsbDevice getUsbDevice()
-    {
+    public UsbDevice getUsbDevice() {
         return usbDevice;
     }
 
-    public void setUsbDevice(UsbDevice usbDevice)
-    {
+    public void setUsbDevice(UsbDevice usbDevice) {
         this.usbDevice = usbDevice;
     }
 
-    public UsbInterface getUsbInterface()
-    {
+    public UsbInterface getUsbInterface() {
         return usbInterface;
     }
 
-    public void setUsbInterface(UsbInterface usbInterface)
-    {
+    public void setUsbInterface(UsbInterface usbInterface) {
         this.usbInterface = usbInterface;
     }
 
-    public UsbDeviceConnection getUsbDeviceConnection()
-    {
+    public UsbDeviceConnection getUsbDeviceConnection() {
         return usbDeviceConnection;
     }
 
-    public void setUsbDeviceConnection(UsbDeviceConnection usbDeviceConnection)
-    {
+    public void setUsbDeviceConnection(UsbDeviceConnection usbDeviceConnection) {
         this.usbDeviceConnection = usbDeviceConnection;
     }
 
-    public UsbEndpoint getEndpointIn()
-    {
+    public UsbEndpoint getEndpointIn() {
         return endpointIn;
     }
 
-    public void setEndpointIn(UsbEndpoint endpointIn)
-    {
+    public void setEndpointIn(UsbEndpoint endpointIn) {
         this.endpointIn = endpointIn;
     }
 
-    public UsbEndpoint getEndpointOut()
-    {
+    public UsbEndpoint getEndpointOut() {
         return endpointOut;
     }
 
-    public void setEndpointOut(UsbEndpoint endpointOut)
-    {
+    public void setEndpointOut(UsbEndpoint endpointOut) {
         this.endpointOut = endpointOut;
     }
 }

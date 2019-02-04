@@ -27,8 +27,7 @@ import org.xmlpull.v1.XmlPullParser;
  * @author Ysj
  * Created time: 2019/1/18 10:46
  */
-public class USBReceiver extends BroadcastReceiver
-{
+public class USBReceiver extends BroadcastReceiver {
     private static final String TAG = USBReceiver.class.getSimpleName();
 
     /**
@@ -43,8 +42,7 @@ public class USBReceiver extends BroadcastReceiver
     private OnDeviceStateListener onDeviceStateListener;
     private OnDevicePermissionListener onDevicePermissionListener;
 
-    protected USBReceiver()
-    {
+    protected USBReceiver() {
         mUsbHolder = USBHolder.getInstance();
     }
 
@@ -54,12 +52,10 @@ public class USBReceiver extends BroadcastReceiver
     /**
      * 设置设备状态监听
      */
-    protected void setOnDeviceStateListener(OnDeviceStateListener onDeviceStateListener)
-    {
+    protected void setOnDeviceStateListener(OnDeviceStateListener onDeviceStateListener) {
         this.onDeviceStateListener = onDeviceStateListener;
         // 在设置了状态监听后回调上次没回调成功的状态
-        if (!TextUtils.isEmpty(mAction) && onDeviceStateListener != null)
-        {
+        if (!TextUtils.isEmpty(mAction) && onDeviceStateListener != null) {
             sendDeviceState(mAction);
             mAction = null;
         }
@@ -70,10 +66,8 @@ public class USBReceiver extends BroadcastReceiver
      *
      * @param action 状态 action
      */
-    protected void sendDeviceState(String action)
-    {
-        if (this.onDeviceStateListener != null)
-        {
+    protected void sendDeviceState(String action) {
+        if (this.onDeviceStateListener != null) {
             this.onDeviceStateListener.onDeviceState(action);
             return;
         }
@@ -83,8 +77,7 @@ public class USBReceiver extends BroadcastReceiver
     /**
      * 设置权限请求结果监听
      */
-    protected void setOnDevicePermissionListener(OnDevicePermissionListener onDevicePermissionListener)
-    {
+    protected void setOnDevicePermissionListener(OnDevicePermissionListener onDevicePermissionListener) {
         this.onDevicePermissionListener = onDevicePermissionListener;
     }
 
@@ -93,30 +86,24 @@ public class USBReceiver extends BroadcastReceiver
      *
      * @param hasPermission 有连接权限则为 true
      */
-    private void sendPermissionState(boolean hasPermission)
-    {
-        if (this.onDevicePermissionListener != null)
-        {
+    private void sendPermissionState(boolean hasPermission) {
+        if (this.onDevicePermissionListener != null) {
             this.onDevicePermissionListener.onDevicePermission(hasPermission);
         }
     }
 
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        if (action == null)
-        {
+        if (action == null) {
             return;
         }
         UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-        switch (action)
-        {
+        switch (action) {
             case ACTION_USB_PERMISSION:
                 // 获取权限结果
                 boolean hasPermission = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
-                if (hasPermission)
-                {
+                if (hasPermission) {
                     connected(context);
                 }
                 sendPermissionState(hasPermission);
@@ -133,21 +120,17 @@ public class USBReceiver extends BroadcastReceiver
         }
     }
 
-    private void onDeviceAttached(Context context, UsbDevice device)
-    {
-        if (!isMyDevice(device))
-        {
+    private void onDeviceAttached(Context context, UsbDevice device) {
+        if (!isMyDevice(device)) {
             // 回调未知设备
             sendDeviceState(UsbAction.ACTION_DEVICE_UNKNOWN);
             return;
         }
-        if (initMyDevice(device))
-        {
+        if (initMyDevice(device)) {
             sendDeviceState(UsbManager.ACTION_USB_DEVICE_ATTACHED);
             // 回调已连接
             connected(context);
-        } else
-        {
+        } else {
             // 回调未知设备
             sendDeviceState(UsbAction.ACTION_DEVICE_UNKNOWN);
         }
@@ -156,27 +139,22 @@ public class USBReceiver extends BroadcastReceiver
     /**
      * 连接 usb
      */
-    public void connected(Context context)
-    {
-        if (context == null)
-        {
+    public void connected(Context context) {
+        if (context == null) {
             return;
         }
-        if (mUsbHolder.isConnected())
-        {
+        if (mUsbHolder.isConnected()) {
             sendDeviceState(UsbAction.ACTION_USB_CONNECTED);
             return;
         }
         UsbDevice device = mUsbHolder.getUsbDevice();
         UsbInterface usbInterface = mUsbHolder.getUsbInterface();
-        if (mUsbManager == null || device == null || usbInterface == null)
-        {
+        if (mUsbManager == null || device == null || usbInterface == null) {
             return;
         }
         // 判断是否有 usb 的连接权限，若没有则提示请求权限
         boolean hasPermission = mUsbManager.hasPermission(device);
-        if (!hasPermission)
-        {
+        if (!hasPermission) {
             mUsbManager.requestPermission(device,
                     PendingIntent.getBroadcast(context, 1, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_ONE_SHOT)
             );
@@ -184,33 +162,27 @@ public class USBReceiver extends BroadcastReceiver
         }
         // 获取连接
         UsbDeviceConnection connection = mUsbManager.openDevice(device);
-        if (connection == null)
-        {
+        if (connection == null) {
             return;
         }
         // 打开传输接口
         boolean claimInterface = connection.claimInterface(usbInterface, true);
-        if (!claimInterface)
-        {
+        if (!claimInterface) {
             return;
         }
         // 获取输入输出端点
         UsbEndpoint mUsbEndpointIn = null;
         UsbEndpoint mUsbEndpointOut = null;
-        for (int i = 0; i < usbInterface.getEndpointCount(); i++)
-        {
+        for (int i = 0; i < usbInterface.getEndpointCount(); i++) {
             UsbEndpoint usbEndpoint = usbInterface.getEndpoint(i);
             // 判断端点的类型（USB_DIR_IN 输入）
-            if (usbEndpoint.getDirection() == UsbConstants.USB_DIR_IN)
-            {
+            if (usbEndpoint.getDirection() == UsbConstants.USB_DIR_IN) {
                 mUsbEndpointIn = usbEndpoint;
-            } else
-            {
+            } else {
                 mUsbEndpointOut = usbEndpoint;
             }
         }
-        if (mUsbEndpointIn == null || mUsbEndpointOut == null)
-        {
+        if (mUsbEndpointIn == null || mUsbEndpointOut == null) {
             return;
         }
         mUsbHolder.setUsbDeviceConnection(connection);
@@ -224,15 +196,11 @@ public class USBReceiver extends BroadcastReceiver
      *
      * @param usbDevice *
      */
-    private boolean initMyDevice(UsbDevice usbDevice)
-    {
-        for (int i = 0; i < usbDevice.getInterfaceCount(); i++)
-        {
+    private boolean initMyDevice(UsbDevice usbDevice) {
+        for (int i = 0; i < usbDevice.getInterfaceCount(); i++) {
             UsbInterface usbInterface = usbDevice.getInterface(i);
-            for (UsbFilter filter : mUsbHolder.filters)
-            {
-                if (usbInterface.getId() == filter.getInterfaceId() && usbInterface.getInterfaceSubclass() == filter.getInterfaceSubclass())
-                {
+            for (UsbFilter filter : mUsbHolder.filters) {
+                if (usbInterface.getId() == filter.getInterfaceId() && usbInterface.getInterfaceSubclass() == filter.getInterfaceSubclass()) {
                     mUsbHolder.setUsbInterface(usbInterface);
                     mUsbHolder.setUsbDevice(usbDevice);
                     return true;
@@ -248,16 +216,12 @@ public class USBReceiver extends BroadcastReceiver
      * @param usbDevice *
      * @return 如果是返回 true
      */
-    private boolean isMyDevice(UsbDevice usbDevice)
-    {
-        if (usbDevice == null)
-        {
+    private boolean isMyDevice(UsbDevice usbDevice) {
+        if (usbDevice == null) {
             return false;
         }
-        for (UsbFilter filter : mUsbHolder.filters)
-        {
-            if (usbDevice.getProductId() == filter.getProductId() && usbDevice.getVendorId() == filter.getVendorId())
-            {
+        for (UsbFilter filter : mUsbHolder.filters) {
+            if (usbDevice.getProductId() == filter.getProductId() && usbDevice.getVendorId() == filter.getVendorId()) {
                 return true;
             }
         }
@@ -269,13 +233,11 @@ public class USBReceiver extends BroadcastReceiver
      *
      * @return 若成功则返回 true
      */
-    protected boolean registerReceiver(@NonNull Context context)
-    {
+    protected boolean registerReceiver(@NonNull Context context) {
         mUsbManager = (UsbManager) context.getApplicationContext().getSystemService(Context.USB_SERVICE);
         Log.d(TAG, "mUsbManager: " + mUsbManager);
         boolean b = initDeviceFilter(context);
-        if (!b || mUsbManager == null)
-        {
+        if (!b || mUsbManager == null) {
             Log.e(TAG, "register receiver failure !!");
             Log.e(TAG, "UsbManager: " + mUsbManager);
             Log.e(TAG, "init device filter: " + b);
@@ -286,8 +248,7 @@ public class USBReceiver extends BroadcastReceiver
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         context.registerReceiver(this, filter);
         // 注册完成后进行连接
-        for (UsbDevice device : mUsbManager.getDeviceList().values())
-        {
+        for (UsbDevice device : mUsbManager.getDeviceList().values()) {
             onDeviceAttached(context, device);
         }
         return true;
@@ -300,23 +261,18 @@ public class USBReceiver extends BroadcastReceiver
      *
      * @return 若初始化成功则返回 true
      */
-    private boolean initDeviceFilter(Context context)
-    {
-        try
-        {
+    private boolean initDeviceFilter(Context context) {
+        try {
             // 获取 Application 中的 key 为 "android.hardware.usb.action.USB_DEVICE_ATTACHED" 的 meta-data 的 resource
             Bundle metaData = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData;
             int device_filter = metaData.getInt("android.hardware.usb.action.USB_DEVICE_ATTACHED");
-            try (XmlResourceParser xml = context.getResources().getXml(device_filter))
-            {
+            try (XmlResourceParser xml = context.getResources().getXml(device_filter)) {
                 int eventType;
                 // 读取这个 xml 文件
-                while ((eventType = xml.next()) != XmlResourceParser.END_DOCUMENT)
-                {
+                while ((eventType = xml.next()) != XmlResourceParser.END_DOCUMENT) {
                     String name = xml.getName();
                     // 如果标签是开头并且是 usb-device 则获取改标签下的 4  个值
-                    if (name != null && eventType == XmlPullParser.START_TAG && name.equals("usb-device"))
-                    {
+                    if (name != null && eventType == XmlPullParser.START_TAG && name.equals("usb-device")) {
                         Log.d(TAG, "getAttributeName-0: " + xml.getAttributeName(2));
                         Log.d(TAG, "getAttributeName-1: " + xml.getAttributeName(3));
                         Log.d(TAG, "getAttributeName-2: " + xml.getAttributeName(0));
@@ -333,13 +289,11 @@ public class USBReceiver extends BroadcastReceiver
                                 Integer.parseInt(interface_id), Integer.parseInt(interface_subclass)));
                     }
                 }
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
-        } catch (PackageManager.NameNotFoundException e)
-        {
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return false;
         }
