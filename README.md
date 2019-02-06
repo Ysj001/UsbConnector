@@ -39,7 +39,7 @@ dependencies {
 # 二.初始化连接器 / 释放连接器
 - 在任意位置都可调用 UsbConnector.init(context) 来对该库进行初始化，如下为在 Activity 的 onCreate() 函数中初始化
 
-- 在任意位置都可调用 UsbConnector.release(context) 来释放该库，如下为在 Activity 的 onTerminate() 函数中释放
+- 在任意位置都可调用 UsbConnector.release(context) 来释放该库，如下为在 Activity 的 onDestroy() 函数中释放
 ```java
     @Override
     protected void onCreate(Bundle savedInstanceState) {
