@@ -1,5 +1,5 @@
 ﻿
-先上文档 : [Android Usb 官方文档](https://developer.android.google.cn/reference/android/hardware/usb/package-summary?hl=zh-cn)
+[![](https://jitpack.io/v/Ysj001/UsbConnector.svg)](https://jitpack.io/#Ysj001/UsbConnector)
 
 简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库。运用该库可省略 USB 状态监听及 USB 连接权限的处理，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听的功能！
 
@@ -97,8 +97,6 @@ mOperate.connected(this);
 ```java 
     // 用于过滤设备的 filters
     List<UsbFilter> filters = new ArrayList<>();
-    // usb 的广播接收器
-    USBReceiver usbReceiver;
     // usb 设备
     UsbDevice usbDevice;
     // 该设备的连接接口
