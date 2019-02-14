@@ -19,7 +19,7 @@ allprojects {
 ### Step 2. Add the dependency
 ```gradle
 dependencies {
-	        implementation 'com.github.Ysj001:UsbConnector:1.0.3'
+	        implementation 'com.github.Ysj001:UsbConnector:1.0.4'
 	}
 ```
 ## 2.创建 Usb Device 过滤文件
