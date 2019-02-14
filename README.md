@@ -1,7 +1,8 @@
 ﻿
 [![](https://jitpack.io/v/Ysj001/UsbConnector.svg)](https://jitpack.io/#Ysj001/UsbConnector)
 
-简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库。运用该库可省略 USB 状态监听及 USB 连接权限的处理，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听的功能！
+简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库。
+运用该库可省略 USB 状态监听及 USB 连接权限的处理，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听的功能！
 
 # 一.基本配置
 ## 1.导入 USBConnector 库
@@ -67,7 +68,7 @@ IUsbOperate mOperate = new UsbOperate();
 - 插入的设备是否是过滤文件中的设备
 - 是否已经连接上
 
-以上状态均可用一下方法监听：
+以上状态均可用以下方法监听：
 ```java
 mOperate.setOnDeviceStateListener(new OnDeviceStateListener() {
             @Override

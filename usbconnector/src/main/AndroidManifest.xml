@@ -10,6 +10,7 @@
         <!--用于 usb 权限请求的 activity ，该 activity 可以防止每次 usb 都要请求连接权限-->
         <activity
             android:name="com.ysj.usb.usbconnector.core.UsbPermissionActivity"
+            android:launchMode="singleInstance"
             android:theme="@style/TranslucentAppTheme">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
