@@ -271,7 +271,7 @@ public class USBReceiver extends BroadcastReceiver {
                 // 读取这个 xml 文件
                 while ((eventType = xml.next()) != XmlResourceParser.END_DOCUMENT) {
                     String name = xml.getName();
-                    // 如果标签是开头并且是 usb-device 则获取改标签下的 4  个值
+                    // 如果标签是开头并且是 usb-device 则获取该标签下的 4  个值
                     if (name != null && eventType == XmlPullParser.START_TAG && name.equals("usb-device")) {
                         Log.d(TAG, "getAttributeName-0: " + xml.getAttributeName(2));
                         Log.d(TAG, "getAttributeName-1: " + xml.getAttributeName(3));
@@ -285,8 +285,12 @@ public class USBReceiver extends BroadcastReceiver {
                         Log.d(TAG, "vendor-id: " + vendor_id);
                         Log.d(TAG, "interface-id: " + interface_id);
                         Log.d(TAG, "interface-subclass: " + interface_subclass);
-                        mUsbHolder.filters.add(new UsbFilter(Integer.parseInt(product_id), Integer.parseInt(vendor_id),
-                                Integer.parseInt(interface_id), Integer.parseInt(interface_subclass)));
+                        mUsbHolder.filters.add(
+                                new UsbFilter(
+                                        Integer.decode(product_id), Integer.decode(vendor_id),
+                                        Integer.decode(interface_id), Integer.decode(interface_subclass)
+                                )
+                        );
                     }
                 }
             } catch (Exception e) {
