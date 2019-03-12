@@ -115,7 +115,7 @@ public class USBReceiver extends BroadcastReceiver {
             // 设备拔出了
             case UsbManager.ACTION_USB_DEVICE_DETACHED:
                 mUsbHolder.onUsbDetached();
-                sendDeviceState(action);
+                sendDeviceState(UsbManager.ACTION_USB_DEVICE_DETACHED);
                 break;
         }
     }
