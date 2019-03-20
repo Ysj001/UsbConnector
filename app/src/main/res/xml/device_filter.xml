@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <usb-device product-id="65535" vendor-id="2663" interface-id="3" interface-subclass="0" />
-    <usb-device product-id="0x2433" vendor-id="0x03eb" interface-id="13" interface-subclass="10" />
-    <usb-device product-id="222" vendor-id="1212" interface-id="31" interface-subclass="01" />
+    <!--<usb-device product-id="0x2433" vendor-id="0x03eb" interface-id="13" interface-subclass="10" />-->
+    <!--<usb-device product-id="222" vendor-id="1212" interface-id="31" interface-subclass="01" />-->
 </resources>

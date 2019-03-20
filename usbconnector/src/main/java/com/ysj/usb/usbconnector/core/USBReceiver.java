@@ -15,6 +15,7 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -36,18 +37,30 @@ public class USBReceiver extends BroadcastReceiver {
     public static final String ACTION_USB_PERMISSION = "USB_PERMISSION";
 
     private UsbManager mUsbManager;
-
     private USBHolder mUsbHolder;
-
     private OnDeviceStateListener onDeviceStateListener;
     private OnDevicePermissionListener onDevicePermissionListener;
+    // 记录未设置 OnDeviceStateListener 前的状态 action
+    private String mAction;
+    // device_filter.xml 中的设备中的设备插入后的行为
+    @Nullable
+    private Runnable doOnMyDeviceAttached;
+    // 行为是否已经发生的标记（保证不会重复调用）
+    private boolean isDoOnMyDeviceAttached = false;
+
+    // 获取权限失败后的行为
+    @Nullable
+    private Runnable doOnDeviceHasPermission;
+    private boolean isDoOnDeviceHasPermission = false;
+
+    // 获取权限失败后的行为
+    @Nullable
+    private Runnable doOnDeviceNoPermission;
+    private boolean isDoOnDeviceNoPermission = false;
 
     protected USBReceiver() {
         mUsbHolder = USBHolder.getInstance();
     }
-
-    // 记录未设置 OnDeviceStateListener 前的状态 action
-    private String mAction;
 
     /**
      * 设置设备状态监听
@@ -66,7 +79,7 @@ public class USBReceiver extends BroadcastReceiver {
      *
      * @param action 状态 action
      */
-    protected void sendDeviceState(String action) {
+    protected void sendDeviceState(@NonNull String action) {
         if (this.onDeviceStateListener != null) {
             this.onDeviceStateListener.onDeviceState(action);
             return;
@@ -92,6 +105,49 @@ public class USBReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * 设置device_filter.xml 中的设备插入后的行为
+     *
+     * @param doOnMyDeviceAttached device_filter.xml 中的设备插入后的行为
+     */
+    public void setDoOnMyDeviceAttached(@Nullable Runnable doOnMyDeviceAttached) {
+        this.doOnMyDeviceAttached = doOnMyDeviceAttached;
+    }
+
+    /**
+     * 设置成功获取权限后的行为
+     *
+     * @param doOnDeviceHasPermission 成功获取权限后的行为
+     */
+    public void setDoOnDeviceHasPermission(Runnable doOnDeviceHasPermission) {
+        this.doOnDeviceHasPermission = doOnDeviceHasPermission;
+    }
+
+    private void doOnDeviceHasPermission(boolean hasPermission) {
+        if (this.doOnDeviceHasPermission != null && !isDoOnDeviceHasPermission && hasPermission) {
+            this.doOnDeviceHasPermission.run();
+            isDoOnDeviceHasPermission = true;
+            Log.d(TAG, "doOnDeviceHasPermission");
+        }
+    }
+
+    /**
+     * 设置获取权限失败后的行为
+     *
+     * @param doOnDeviceMoPermission 获取权限失败后的行为
+     */
+    public void setDoOnDeviceNoPermission(Runnable doOnDeviceMoPermission) {
+        this.doOnDeviceNoPermission = doOnDeviceMoPermission;
+    }
+
+    private void doOnDeviceNoPermission(boolean hasPermission) {
+        if (this.doOnDeviceNoPermission != null && !isDoOnDeviceNoPermission && !hasPermission) {
+            this.doOnDeviceNoPermission.run();
+            isDoOnDeviceNoPermission = true;
+            Log.d(TAG, "doOnDeviceNoPermission");
+        }
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -103,6 +159,8 @@ public class USBReceiver extends BroadcastReceiver {
             case ACTION_USB_PERMISSION:
                 // 获取权限结果
                 boolean hasPermission = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
+                doOnDeviceHasPermission(hasPermission);
+                doOnDeviceNoPermission(hasPermission);
                 if (hasPermission) {
                     connected(context);
                 }
@@ -114,25 +172,34 @@ public class USBReceiver extends BroadcastReceiver {
                 break;
             // 设备拔出了
             case UsbManager.ACTION_USB_DEVICE_DETACHED:
+                isDoOnMyDeviceAttached = false;
+                isDoOnDeviceHasPermission = false;
+                isDoOnDeviceNoPermission = false;
                 mUsbHolder.onUsbDetached();
-                sendDeviceState(UsbManager.ACTION_USB_DEVICE_DETACHED);
+                sendDeviceState(action);
                 break;
         }
     }
 
     private void onDeviceAttached(Context context, UsbDevice device) {
+        mUsbHolder.setUsbDevice(device);
         if (!isMyDevice(device)) {
             // 回调未知设备
             sendDeviceState(UsbAction.ACTION_DEVICE_UNKNOWN);
             return;
         }
-        if (initMyDevice(device)) {
-            sendDeviceState(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-            // 回调已连接
+        // 回调已插入
+        sendDeviceState(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        if (doOnMyDeviceAttached != null && !isDoOnMyDeviceAttached) {
+            Log.d(TAG, "doOnMyDeviceAttached");
+            doOnMyDeviceAttached.run();
+            isDoOnMyDeviceAttached = true;
+        }
+        if (initMyDeviceInterface(device)) {
             connected(context);
         } else {
-            // 回调未知设备
-            sendDeviceState(UsbAction.ACTION_DEVICE_UNKNOWN);
+            // 回调未知设备接口
+            sendDeviceState(UsbAction.ACTION_DEVICE_UNKNOWN_INTERFACE);
         }
     }
 
@@ -154,6 +221,8 @@ public class USBReceiver extends BroadcastReceiver {
         }
         // 判断是否有 usb 的连接权限，若没有则提示请求权限
         boolean hasPermission = mUsbManager.hasPermission(device);
+        doOnDeviceHasPermission(hasPermission);
+        doOnDeviceNoPermission(hasPermission);
         if (!hasPermission) {
             mUsbManager.requestPermission(device,
                     PendingIntent.getBroadcast(context, 1, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_ONE_SHOT)
@@ -188,15 +257,16 @@ public class USBReceiver extends BroadcastReceiver {
         mUsbHolder.setUsbDeviceConnection(connection);
         mUsbHolder.setEndpointIn(mUsbEndpointIn);
         mUsbHolder.setEndpointOut(mUsbEndpointOut);
+        // 回调已连接
         sendDeviceState(UsbAction.ACTION_USB_CONNECTED);
     }
 
     /**
-     * 初始化需要的设备
+     * 初始化设备的接口
      *
      * @param usbDevice *
      */
-    private boolean initMyDevice(UsbDevice usbDevice) {
+    private boolean initMyDeviceInterface(UsbDevice usbDevice) {
         for (int i = 0; i < usbDevice.getInterfaceCount(); i++) {
             UsbInterface usbInterface = usbDevice.getInterface(i);
             for (UsbFilter filter : mUsbHolder.filters) {
@@ -216,7 +286,7 @@ public class USBReceiver extends BroadcastReceiver {
      * @param usbDevice *
      * @return 如果是返回 true
      */
-    private boolean isMyDevice(UsbDevice usbDevice) {
+    public boolean isMyDevice(UsbDevice usbDevice) {
         if (usbDevice == null) {
             return false;
         }
@@ -246,7 +316,7 @@ public class USBReceiver extends BroadcastReceiver {
         IntentFilter filter = new IntentFilter(USBReceiver.ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        context.registerReceiver(this, filter);
+        context.getApplicationContext().registerReceiver(this, filter);
         // 注册完成后进行连接
         for (UsbDevice device : mUsbManager.getDeviceList().values()) {
             onDeviceAttached(context, device);
@@ -261,7 +331,10 @@ public class USBReceiver extends BroadcastReceiver {
      *
      * @return 若初始化成功则返回 true
      */
-    private boolean initDeviceFilter(Context context) {
+    public boolean initDeviceFilter(Context context) {
+        if (!mUsbHolder.filters.isEmpty()) {
+            return true;
+        }
         try {
             // 获取 Application 中的 key 为 "android.hardware.usb.action.USB_DEVICE_ATTACHED" 的 meta-data 的 resource
             Bundle metaData = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData;

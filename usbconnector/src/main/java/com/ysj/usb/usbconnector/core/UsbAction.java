@@ -55,8 +55,15 @@ public interface UsbAction {
     /**
      * 未知的 USB device 的 action
      * <p>
-     * 及插入的设备未在 device_filter.xml 中找到
+     * 即插入的设备未在 device_filter.xml 中找到
      */
     String ACTION_DEVICE_UNKNOWN = "ACTION_DEVICE_UNKNOWN";
+
+    /**
+     * 未知的 USB device interface 的 acation
+     * <p>
+     * 即 device_filter.xml 中设置的 interface-id ，interface-subclass 未在 插入的设备的 interface 枚举中找到
+     */
+    String ACTION_DEVICE_UNKNOWN_INTERFACE = "ACTION_DEVICE_UNKNOWN_INTERFACE";
 
 }

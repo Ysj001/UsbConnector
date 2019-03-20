@@ -1,5 +1,6 @@
 package com.ysj.usb.usbtest;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
@@ -10,7 +11,6 @@ import com.ysj.usb.usbconnector.core.OnDevicePermissionListener;
 import com.ysj.usb.usbconnector.core.OnDeviceStateListener;
 import com.ysj.usb.usbconnector.core.USBHolder;
 import com.ysj.usb.usbconnector.core.UsbAction;
-import com.ysj.usb.usbconnector.core.UsbConnector;
 import com.ysj.usb.usbconnector.core.UsbOperate;
 
 
@@ -30,20 +30,17 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        UsbConnector.init(this);
         tv_filter = (TextView) findViewById(R.id.tv_filter);
         tv_state = (TextView) findViewById(R.id.tv_state);
         tv_permission = (TextView) findViewById(R.id.tv_permission);
         tv_info = (TextView) findViewById(R.id.tv_info);
         btn_connect = (Button) findViewById(R.id.btn_connect);
         btn_disconnnect = (Button) findViewById(R.id.btn_disconnect);
+        // 跳转到发送测试页
+        findViewById(R.id.btn_send_test).setOnClickListener(
+                v -> startActivity(new Intent(this, SendTestActivity.class))
+        );
         init();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        UsbConnector.release(this);
     }
 
     private void init() {
@@ -58,7 +55,6 @@ public class MainActivity extends AppCompatActivity
                         .replace("{", "")
                         .replace("}", "====================")
         );
-        tv_info.setText(GsonUtil.toJson(USBHolder.getInstance().getUsbDevice()));
     }
 
     @Override
@@ -68,6 +64,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDeviceState(String action) {
+        tv_info.setText(GsonUtil.toJson(USBHolder.getInstance().getUsbDevice()));
         switch (action) {
             case UsbAction.ACTION_USB_DEVICE_ATTACHED:
                 tv_state.setText("USB device 插入: " + action);
@@ -81,9 +78,11 @@ public class MainActivity extends AppCompatActivity
             case UsbAction.ACTION_DEVICE_UNKNOWN:
                 tv_state.setText("插入的设备未在 device_filter.xml 中找到: " + action);
                 break;
+            case UsbAction.ACTION_DEVICE_UNKNOWN_INTERFACE:
+                tv_state.setText("device_filter.xml 中设置的 interface-id ，interface-subclass 未在 插入的设备的 interface 枚举中找到: " + action);
+                break;
             case UsbAction.ACTION_USB_CONNECTED:
                 tv_state.setText("USB device 建立连接成功: " + action);
-                tv_info.setText(GsonUtil.toJson(USBHolder.getInstance().getUsbDevice()));
                 break;
         }
     }

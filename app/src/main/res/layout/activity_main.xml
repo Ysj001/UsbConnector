@@ -103,6 +103,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="disconnect" />
+
+            <Button
+                android:id="@+id/btn_send_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="send test" />
         </LinearLayout>
     </ScrollView>
 
