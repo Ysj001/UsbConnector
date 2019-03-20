@@ -2,7 +2,7 @@
 [![](https://jitpack.io/v/Ysj001/UsbConnector.svg)](https://jitpack.io/#Ysj001/UsbConnector)
 
 简介：由于安卓连接 USB device 颇为繁琐，因此本着不重复造轮子的原则写了一个 UsbConnector 库。
-运用该库可省略 USB 状态监听及 USB 连接权限的处理，三步即可轻松实现安卓连接 USB device ，以及各种状态的监听的功能！
+运用该库三步即可轻松实现安卓连接 USB device， USB 状态监听及 USB 连接权限的处理的功能！
 
 # 一.基本配置
 ## 1.导入 USBConnector 库
@@ -19,7 +19,7 @@ allprojects {
 ### Step 2. Add the dependency
 ```gradle
 dependencies {
-	        implementation 'com.github.Ysj001:UsbConnector:1.0.4'
+	        implementation 'com.github.Ysj001:UsbConnector:1.0.5'
 	}
 ```
 ## 2.创建 Usb Device 过滤文件
@@ -32,28 +32,27 @@ dependencies {
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <usb-device product-id="65535" vendor-id="2663" interface-id="3" interface-subclass="0" />
-    <usb-device product-id="111111" vendor-id="1212" interface-id="13" interface-subclass="10" />
-    <usb-device product-id="222" vendor-id="1212" interface-id="31" interface-subclass="01" />
+    <usb-device product-id="0x01" vendor-id="0x02" interface-id="0x03" interface-subclass="0x00" />
+    <usb-device product-id="222" vendor-id="1212" interface-id="31" interface-subclass="1" />
 </resources>
 ```
 
 # 二.初始化连接器 / 释放连接器
-- 在任意位置都可调用 UsbConnector.init(context) 来对该库进行初始化，如下为在 Activity 的 onCreate() 函数中初始化
+- 在任意位置都可调用 UsbConnector.register(context) 来对该库进行初始化，如下为在 Application 的 onCreate() 函数中初始化
 
-- 在任意位置都可调用 UsbConnector.release(context) 来释放该库，如下为在 Activity 的 onDestroy() 函数中释放
+- 在任意位置都可调用 UsbConnector.unregister(context) 来释放该库，如下为在 Application 的 onTerminate() 函数中释放
 ```java
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        UsbConnector.init(this);
-    }
-    ... ... 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        UsbConnector.release(this);
-    }
+        @Override
+        public void onCreate() {
+            super.onCreate();
+            UsbConnector.register(this);
+        }
+    
+        @Override
+        public void onTerminate() {
+            super.onTerminate();
+            UsbConnector.unregister(this);
+        }
 ```
 以上步骤完成后
 # 三.对 USB device 进行操作
@@ -93,7 +92,7 @@ mOperate.setOnDevicePermissionListener(new OnDevicePermissionListener() {
 mOperate.connected(this);
 ```
 ## 其他操作
-- 若想获取一下内容均可在 USBHolder. getInstance() 中
+- 若想获取以下内容均可在 USBHolder. getInstance() 中
 
 ```java 
     // 用于过滤设备的 filters
